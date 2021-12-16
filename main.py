@@ -101,12 +101,14 @@ def get_user_detail(
         min_length=1, 
         max_length=50,
         title="User name",
-        description="This is the user name. It's between 1 and 50 characters."
+        description="This is the user name. It's between 1 and 50 characters.",
+        example="Carlos"
         ), 
     age: int = Query(
         ..., 
         title="User age", 
-        description="This is the user age. It's a required query parameter."
+        description="This is the user age. It's a required query parameter.",
+        example=25
         )
     ):
     return { "name": name, "age": age }
@@ -118,7 +120,8 @@ def get_user_detail(
         ..., 
         gt=0,
         title="User ID",
-        description="This is the user ID. It's greater than 0."
+        description="This is the user ID. It's greater than 0.",
+        example=123
         )
     ):
     return { "name": "Carlos", "age": 25, "id": user_id }
@@ -131,7 +134,8 @@ def update_user(
         ..., 
         gt=0,
         title="User ID",
-        description="This is the user ID. It's greater than 0."
+        description="This is the user ID. It's greater than 0.",
+        example=123
         ),
         person: Person = Body(...),
         location: Location = Body(...)
