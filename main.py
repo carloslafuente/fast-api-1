@@ -1,9 +1,11 @@
 # Python
 from typing import Optional
 from datetime import datetime
+from enum import Enum
 
 # Pydantinc
 from pydantic import BaseModel
+from pydantic.fields import Field
 
 # FastAPI
 from fastapi import FastAPI
@@ -13,13 +15,42 @@ from fastapi import Body, Query, Path
 app = FastAPI()
 
 # Models
+class HairColor(Enum):
+    white = "white"
+    brown = "brown"
+    black = "black"
+    blonde = "blonde"
+    red = "red"
+
 class Person(BaseModel):
-    first_name: str
-    last_name: str
-    age: int
+    first_name: str = Field(
+        ...,
+        min_length=1,
+        max_length=50
+        )
+    last_name: str = Field(
+        ...,
+        min_length=1,
+        max_length=50
+        )
+    age: int = Field(
+        ...,
+        gt=0,
+        le=120
+        )
     birthday: datetime
-    hair_color: Optional[str] = None
-    is_married: Optional[bool] = None
+    hair_color: Optional[HairColor] = Field(
+            default=None
+        )
+    is_married: Optional[bool] = Field(
+        default=None,
+        )
+
+class Location(BaseModel):
+    city: str
+    state: str
+    country: str
+
 
 # Path Operations
 @app.get("/")
@@ -49,7 +80,7 @@ def get_user_detail(
     ):
     return { "name": name, "age": age }
 
-# Validations: Query parameters
+# Validations: Path parameters
 @app.get("/user/detail/{user_id}")
 def get_user_detail(
     user_id: int = Path(
@@ -60,3 +91,22 @@ def get_user_detail(
         )
     ):
     return { "name": "Carlos", "age": 25, "id": user_id }
+
+
+# Validations: Request Body 
+@app.put("/user/{user_id}")
+def update_user(
+        user_id: int = Path(
+        ..., 
+        gt=0,
+        title="User ID",
+        description="This is the user ID. It's greater than 0."
+        ),
+        person: Person = Body(...),
+        location: Location = Body(...)
+    ):
+    result = person.dict()
+    result.update(location.dict())
+
+    # person.dict() & location.dict()
+    return result
