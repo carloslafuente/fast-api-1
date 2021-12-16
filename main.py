@@ -6,6 +6,7 @@ from enum import Enum
 # Pydantinc
 from pydantic import BaseModel
 from pydantic.fields import Field
+from pydantic.networks import EmailStr
 
 # FastAPI
 from fastapi import FastAPI
@@ -21,6 +22,25 @@ class HairColor(Enum):
     black = "black"
     blonde = "blonde"
     red = "red"
+
+
+class Location(BaseModel):
+    city: str = Field(
+        ...,
+        min_length=1,
+        max_length=100
+        )
+    state: str = Field(
+        ...,
+        min_length=1,
+        max_length=100
+        )
+    country: str = Field(
+        ...,
+        min_length=1,
+        max_length=100
+        )
+
 
 class Person(BaseModel):
     first_name: str = Field(
@@ -45,11 +65,22 @@ class Person(BaseModel):
     is_married: Optional[bool] = Field(
         default=None,
         )
+    email: EmailStr = Field(
+        ...,
+    )
 
-class Location(BaseModel):
-    city: str
-    state: str
-    country: str
+    class Config:
+        schema_extra = {
+            "example": {
+                "first_name": "Carlos",
+                "last_name": "La Fuente",
+                "age": 25,
+                "birthday": datetime.now(),
+                "hair_color": HairColor.blonde,
+                "is_married": False,
+                "email": "user@example.com"
+            }
+        }
 
 
 # Path Operations
@@ -105,8 +136,8 @@ def update_user(
         person: Person = Body(...),
         location: Location = Body(...)
     ):
-    result = person.dict()
-    result.update(location.dict())
+    # result = person.dict()
+    # result.update(location.dict())
 
     # person.dict() & location.dict()
-    return result
+    return person
